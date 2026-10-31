@@ -1,0 +1,158 @@
+{
+  "name": "handbook-ide",
+  "displayName": "Handbook IDE",
+  "description": "Software construction handbook: decomposes a project into components, file structure and build steps without writing the code for you.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Education"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onView:handbook.tree",
+    "onCommand:handbook.plan",
+    "onCommand:handbook.explain",
+    "onCommand:handbook.setKey",
+    "onCommand:handbook.clearCache",
+    "onCommand:handbook.diagram",
+    "onCommand:handbook.copyMermaid"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "handbook.plan",
+        "title": "Handbook: Plan Project",
+        "icon": "$(add)"
+      },
+      {
+        "command": "handbook.diagram",
+        "title": "Handbook: Show Architecture Diagram",
+        "icon": "$(type-hierarchy)"
+      },
+      {
+        "command": "handbook.copyMermaid",
+        "title": "Handbook: Copy Mermaid Source"
+      },
+      {
+        "command": "handbook.explain",
+        "title": "Handbook: Explain",
+        "icon": "$(book)"
+      },
+      {
+        "command": "handbook.setKey",
+        "title": "Handbook: Set API Key"
+      },
+      {
+        "command": "handbook.clearCache",
+        "title": "Handbook: Clear Cache"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "handbook.tree",
+          "name": "Handbook"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "handbook.tree",
+        "contents": "No plan yet.\n[Set API key](command:handbook.setKey)\n[Plan a project](command:handbook.plan)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "handbook.plan",
+          "when": "view == handbook.tree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "handbook.diagram",
+          "when": "view == handbook.tree",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "handbook.explain",
+          "when": "view == handbook.tree && viewItem == explainable",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Handbook IDE",
+      "properties": {
+        "handbook.providers": {
+          "type": "array",
+          "default": [
+            {
+              "name": "groq-gpt-oss",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "model": "openai/gpt-oss-120b"
+            },
+            {
+              "name": "groq-qwen",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "model": "qwen/qwen3.8-27b",
+              "keyFrom": "groq-gpt-oss"
+            },
+            {
+              "name": "gemini",
+              "baseUrl": "https://generativelanguage.googleapis.com/v1beta/openai",
+              "model": "TODO: Enter your Gemini Flash model id here (e.g. gemini-2.5-flash)"
+            },
+            {
+              "name": "ollama",
+              "baseUrl": "http://localhost:11434/v1",
+              "model": "llama3.1:8b"
+            }
+          ],
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Provider identifier name"
+              },
+              "baseUrl": {
+                "type": "string",
+                "description": "OpenAI-compatible base URL"
+              },
+              "model": {
+                "type": "string",
+                "description": "Model ID to request"
+              },
+              "maxTokens": {
+                "type": "number",
+                "description": "Optional max_tokens override for this provider"
+              },
+              "keyFrom": {
+                "type": "string",
+                "description": "Optional provider name from which to share SecretStorage API key"
+              }
+            },
+            "required": ["name", "baseUrl", "model"]
+          },
+          "description": "Ordered multi-provider fallback chain for Handbook IDE."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "postinstall": "node scripts/copy-mermaid.js",
+    "compile": "node scripts/copy-mermaid.js && tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "mermaid": "^10.9.0",
+    "typescript": "^5.4.0"
+  }
+}

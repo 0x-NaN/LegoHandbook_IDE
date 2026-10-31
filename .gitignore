@@ -1,0 +1,4 @@
+out/
+node_modules/
+media/mermaid.min.js
+*.vsix
